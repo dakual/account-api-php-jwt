@@ -9,6 +9,7 @@ use App\Controller;
 
 require __DIR__ . '/../vendor/autoload.php';
 
+
 $app = AppFactory::create();
 $app->setBasePath("/app/public");
 $app->addBodyParsingMiddleware();
@@ -19,14 +20,17 @@ $app->addErrorMiddleware(true, true, true);
 
 
 $app->get('/', function (Request $request, Response $response, $args) {
-  $response->getBody()->write("Account API v1.0");
-  return $response;
+  $response->getBody()->write("Accoun Api v1.0");
+  return $response
+    ->withHeader('content-type', 'application/json')
+    ->withStatus(200);
 });
 
+$app->get('/login', Controller\User::class);
 
 $app->group('/api/v1', function (RouteCollectorProxy $group) {
-  $group->get('/employees', Controller\HomeAction::class)->add(new Auth());
-});
+  $group->get('/employees', Controller\HomeAction::class);
+})->add(new Auth());
 
 
 $app->run();
