@@ -32,7 +32,7 @@ class User extends BaseController
     $data = array(
       'success' => true,
       'message' => "Login Successfull",
-      "jwt" => $jwt
+      "jwt" => 'Bearer ' . $jwt
     );
 
     $response->getBody()->write(json_encode($data));
