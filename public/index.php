@@ -7,6 +7,7 @@ use Slim\Routing\RouteCollectorProxy;
 use App\Controller;
 use App\Handler\ErrorHandler;
 
+
 require __DIR__ . '/../vendor/autoload.php';
 
 
@@ -15,22 +16,21 @@ $app->setBasePath("/app/public");
 $app->addBodyParsingMiddleware();
 $app->addRoutingMiddleware();
 $app->add(new BasePathMiddleware($app));
+
 // Add Error Middleware
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);
 $errorHandler    = new ErrorHandler($app->getCallableResolver(), $app->getResponseFactory());
 $errorMiddleware->setDefaultErrorHandler($errorHandler);
 
 $app->get('/', function (Request $request, Response $response, $args) {
-  $response->getBody()->write("Accoun Api v1.0");
-  return $response
-    ->withHeader('content-type', 'application/json')
-    ->withStatus(200);
+  $response->getBody()->write("User Account Api v1.0");
+  return $response;
 });
 
-$app->get('/login', Controller\User::class);
+$app->post('/login', Controller\Login::class);
 
 $app->group('/api/v1', function (RouteCollectorProxy $group) {
-  $group->get('/employees', Controller\HomeAction::class);
+  $group->get('/employees', Controller\Home::class);
 })->add(new App\Middleware\Auth());
 
 

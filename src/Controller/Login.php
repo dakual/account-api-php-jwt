@@ -6,33 +6,40 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use App\Controller\BaseController;
 use Firebase\JWT\JWT;
 
-class User extends BaseController
+class Login extends BaseController
 {
   private $key = "secretkey";
 
   public function __invoke(Request $request, Response $response): Response
   {
-    // $username = $request->getParsedBody('username');
-    // $password = $request->getParsedBody('password');
+    $data = (array) $request->getParsedBody();
+    if (empty($data) || !isset($data['username']) || !isset($data['password'])) {
+      throw new \App\Exception\Auth('Username and Password required!', 400);
+    }
+    $username = $data["username"];
+    $password = $data["password"];
 
     $token = [
-      "iss" => "utopian",
-      "iat" => time(),
-      "exp" => time() + 60,
+      "iss"  => "daghan",
+      "aud"  => "http://example.com",
+      "sub"  => 101,
+      "iat"  => time(),
+      "exp"  => time() + 60,
       "data" => [
-        "user_id" => 101
+        "id"        => 101,
+        "email"     => "daghan@mail.com",
+        "firstname" => "Daghan",
+        "lastname"  => "Altunsoy",
+        "roles"     => array("admin")
       ]
     ];
 
     $jwt = JWT::encode($token, $this->key, 'HS256');
-    
-    // $decoded = JWT::decode($jwt, new Key($key, 'HS256'));
-    // print_r($decoded);
 
     $data = array(
       'success' => true,
       'message' => "Login Successfull",
-      "jwt" => 'Bearer ' . $jwt
+      "token"   => 'Bearer ' . $jwt
     );
 
     $response->getBody()->write(json_encode($data));

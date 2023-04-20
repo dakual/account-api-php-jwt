@@ -10,9 +10,7 @@ docker run --rm -it -v "$(pwd):/app" -p 8080:8080 php:7.4-cli -S 0.0.0.0:8080 -t
 
 curl -H "Authorization: " http://localhost:8080/api/v1/employees
 
-curl --location --request GET 'http://localhost:8080/api/v1/employees' \
---header 'Authorization: Bearer yourToken' \
---header 'Content-Type: application/json'
+curl --location --header 'Authorization: Bearer yourToken' --header 'Content-Type: application/json' --request GET 'http://localhost:8080/api/v1/employees' 
 
 curl --location --request POST 'http://localhost:8080/login' \
 --header 'Content-Type: application/json' \
