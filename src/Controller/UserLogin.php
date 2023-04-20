@@ -6,7 +6,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use App\Controller\BaseController;
 use Firebase\JWT\JWT;
 
-class Login extends BaseController
+class UserLogin extends BaseController
 {
   private $key = "secretkey";
 

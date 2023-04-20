@@ -22,16 +22,26 @@ $errorMiddleware = $app->addErrorMiddleware(true, true, true);
 $errorHandler    = new ErrorHandler($app->getCallableResolver(), $app->getResponseFactory());
 $errorMiddleware->setDefaultErrorHandler($errorHandler);
 
+
 $app->get('/', function (Request $request, Response $response, $args) {
   $response->getBody()->write("User Account Api v1.0");
   return $response;
 });
 
-$app->post('/login', Controller\Login::class);
+$app->group('/api', function (RouteCollectorProxy $group) {
 
-$app->group('/api/v1', function (RouteCollectorProxy $group) {
-  $group->get('/employees', Controller\Home::class);
-})->add(new App\Middleware\Auth());
+  $group->post('/login[/]', Controller\UserLogin::class);
+  $group->get("/logout[/]", Controller\UserLogout::class);
+  
+  $group->group('/user', function (RouteCollectorProxy $group) {
+    $group->post('/create', Controller\UserCreate::class);
+  });
+
+  $group->group('/todo', function (RouteCollectorProxy $group) {
+    $group->get('[/]', Controller\Home::class);
+  })->add(new App\Middleware\Auth());
+  
+});
 
 
 $app->run();
