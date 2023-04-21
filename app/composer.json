@@ -16,7 +16,8 @@
         "slim/slim": "4.*",
         "slim/psr7": "^1.6",
         "selective/basepath": "^2.1",
-        "firebase/php-jwt": "^6.4"
+        "firebase/php-jwt": "^6.4",
+        "php-di/php-di": "^5.4"
     },
 	"config": {
         "platform": {

@@ -19,8 +19,8 @@ $app->add(new BasePathMiddleware($app));
 
 // Add Error Middleware
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);
-$errorHandler    = new ErrorHandler($app->getCallableResolver(), $app->getResponseFactory());
-$errorMiddleware->setDefaultErrorHandler($errorHandler);
+// $errorHandler    = new ErrorHandler($app->getCallableResolver(), $app->getResponseFactory());
+// $errorMiddleware->setDefaultErrorHandler($errorHandler);
 
 
 $app->get('/', function (Request $request, Response $response, $args) {
