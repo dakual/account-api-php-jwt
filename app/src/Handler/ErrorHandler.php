@@ -7,9 +7,12 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Log\LoggerInterface;
 use Slim\Interfaces\ErrorHandlerInterface;
 use Slim\Interfaces\CallableResolverInterface;
+use Fig\Http\Message\StatusCodeInterface;
 use Slim\Logger;
+use Throwable;
 
-class ErrorHandler implements ErrorHandlerInterface {
+class ErrorHandler implements ErrorHandlerInterface 
+{
   protected CallableResolverInterface $callableResolver;
   protected ResponseFactoryInterface $responseFactory;
   protected LoggerInterface $logger;
@@ -33,20 +36,62 @@ class ErrorHandler implements ErrorHandlerInterface {
   ): Response {
     $statusCode = $exception->getCode();
     $className  = new \ReflectionClass(get_class($exception));
-    $payload = [
-      'message' => $exception->getMessage(),
-      'class'   => $className->getName(),
-      'status'  => 'error',
-      'code'    => $statusCode,
-    ];
+
+    if ($logErrors) {
+      $error = $this->getErrorDetails($exception, $logErrorDetails);
+      $error['method'] = $request->getMethod();
+      $error['url'] = (string) $request->getUri();
+
+      // $this->logger->error($exception->getMessage(), $error);
+    }
   
     $response = $this->responseFactory->createResponse();
     $response->getBody()->write(
-        json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)
+      json_encode([
+        'status' => false,
+        'error'  => $this->getErrorDetails($exception, $displayErrorDetails),
+      ], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)
     );
-  
+
     return $response
-      ->withStatus($statusCode)
+      ->withStatus($this->getHttpStatusCode($exception))
       ->withHeader('Content-type', 'application/problem+json');
+  }
+
+  private function getHttpStatusCode(Throwable $exception): int
+  {
+      $statusCode = StatusCodeInterface::STATUS_INTERNAL_SERVER_ERROR;
+      if ($exception instanceof HttpException) {
+          $statusCode = (int)$exception->getCode();
+      }
+
+      if ($exception instanceof DomainException || $exception instanceof InvalidArgumentException) {
+          $statusCode = StatusCodeInterface::STATUS_BAD_REQUEST;
+      }
+
+      $file = basename($exception->getFile());
+      if ($file === 'CallableResolver.php') {
+          $statusCode = StatusCodeInterface::STATUS_NOT_FOUND;
+      }
+
+      return $statusCode;
+  }
+
+  private function getErrorDetails(Throwable $exception, bool $displayErrorDetails): array
+  {
+    if ($displayErrorDetails === true) {
+      return [
+        'message' => $exception->getMessage(),
+        'code' => $exception->getCode(),
+        'file' => $exception->getFile(),
+        'line' => $exception->getLine(),
+        // 'previous' => $exception->getPrevious(),
+        // 'trace' => $exception->getTrace(),
+      ];
+    }
+
+    return [
+      'message' => $exception->getMessage(),
+    ];
   }
 }

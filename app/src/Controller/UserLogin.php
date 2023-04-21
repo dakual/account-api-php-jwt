@@ -10,11 +10,12 @@ use Firebase\JWT\JWT;
 
 class UserLogin extends BaseController
 {
-  private $key = "secretkey";
+  private $key;
   private UserRepository $repository;
 
   public function __construct()
   {
+    $this->key = getenv('JWT_KEY');
     $this->repository = new UserRepository();
   }
 
@@ -23,25 +24,25 @@ class UserLogin extends BaseController
     $data = (array) $request->getParsedBody();
     if (empty($data) || !isset($data['username']) || !isset($data['password'])) {
       throw new \App\Exception\Auth(
-        'Username and Password required!', 400
+        'Login failed: Username and Password required!', 400
       );
     }
     $username = $data["username"];
     $password = $data["password"];
 
     $user = $this->repository->loginUser($username, $password);
-    if (! password_verify($password, $user->getPassword())) {
+    if (! password_verify($password, $user->password)) {
       throw new \App\Exception\Auth(
-        'Login failed: Email or password incorrect.', 400
+        'Login failed: Username or password incorrect!', 400
       );
     }
     
     $token = [
       "iss"  => "daghan",
       "aud"  => "http://example.com",
-      "sub"  => $user->getId(),
+      "sub"  => $user->id,
       "iat"  => time(),
-      "exp"  => time() + 60
+      "exp"  => time() + 60 // (7 * 24 * 60 * 60),
     ];
 
     $jwt = JWT::encode($token, $this->key, 'HS256');
@@ -49,7 +50,6 @@ class UserLogin extends BaseController
     $data = array(
       'success' => true,
       'message' => 'Login Successfull',
-      'user'    => $user->getId(),
       'token'   => 'Bearer ' . $jwt
     );
 

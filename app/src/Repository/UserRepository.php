@@ -7,15 +7,15 @@ class UserRepository extends BaseRepository
 {
   public function loginUser(string $email, string $password): UserEntity
   {
-    $query = 'SELECT * FROM `users` WHERE `email` = :email ORDER BY `id`';
+    $query = 'SELECT * FROM `users` WHERE `username` = :username ORDER BY `id`';
     $statement = $this->database->prepare($query);
-    $statement->bindParam('email', $email);
+    $statement->bindParam('username', $email);
     $statement->execute();
 
     $user = $statement->fetchObject(UserEntity::class);
     if (! $user) {
         throw new \App\Exception\Auth(
-            'Login failed: Email or password incorrect.', 400
+            'Login failed: Username or password incorrect!', 400
         );
     }
 
@@ -24,12 +24,12 @@ class UserRepository extends BaseRepository
 
   public function createUser(UserEntity $user): UserEntity
   {
-    $query     = 'INSERT INTO `users` (`email`, `password`) VALUES (:email, :password)';
+    $query     = 'INSERT INTO `users` (`username`, `password`) VALUES (:username, :password)';
     $statement = $this->database->prepare($query);
-    $email     = $user->getEmail();
-    $password  = $user->getPassword();
+    $username  = $user->username;
+    $password  = $user->password;
 
-    $statement->bindParam('email', $email);
+    $statement->bindParam('username', $username);
     $statement->bindParam('password', $password);
     $statement->execute();
 
@@ -38,7 +38,7 @@ class UserRepository extends BaseRepository
 
   public function getUser(int $userId): UserEntity
   {
-    $query     = 'SELECT `id`, `email` FROM `users` WHERE `id` = :id';
+    $query     = 'SELECT `id`, `username` FROM `users` WHERE `id` = :id';
     $statement = $this->database->prepare($query);
     $statement->bindParam('id', $userId);
     $statement->execute();
@@ -50,15 +50,15 @@ class UserRepository extends BaseRepository
     return $user;
   }
 
-  public function checkUserByEmail(string $email): void
+  public function checkUserByUsername(string $username): void
   {
-      $query     = 'SELECT * FROM `users` WHERE `email` = :email';
+      $query     = 'SELECT * FROM `users` WHERE `username` = :username';
       $statement = $this->database->prepare($query);
-      $statement->bindParam('email', $email);
+      $statement->bindParam('username', $username);
       $statement->execute();
       $user = $statement->fetchObject();
       if ($user) {
-          throw new \App\Exception\Auth('Email already exists.', 400);
+          throw new \App\Exception\Auth('Username already exists.', 400);
       }
   }
 }

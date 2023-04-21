@@ -25,7 +25,7 @@ class UserCreate extends BaseController
     $data = array(
       'success' => true,
       'message' => 'Create Successfull',
-      'user'    => $user->getId()
+      'user'    => $user->id
     );
 
     $response->getBody()->write(json_encode($data));
@@ -43,13 +43,13 @@ class UserCreate extends BaseController
       throw new \App\Exception\Auth('The field "password" is required.', 400);
     }
 
-    $this->repository->checkUserByEmail($data["username"]);
+    $this->repository->checkUserByUsername($data["username"]);
 
     $hash = password_hash($data["password"], PASSWORD_BCRYPT);
 
     $newUser = new UserEntity();
-    $newUser->updateEmail($data["username"]);
-    $newUser->updatePassword($hash);
+    $newUser->username = $data["username"];
+    $newUser->password = $hash;
 
     return $newUser;
   }

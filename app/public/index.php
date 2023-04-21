@@ -19,8 +19,8 @@ $app->add(new BasePathMiddleware($app));
 
 // Add Error Middleware
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);
-// $errorHandler    = new ErrorHandler($app->getCallableResolver(), $app->getResponseFactory());
-// $errorMiddleware->setDefaultErrorHandler($errorHandler);
+$errorHandler    = new ErrorHandler($app->getCallableResolver(), $app->getResponseFactory());
+$errorMiddleware->setDefaultErrorHandler($errorHandler);
 
 
 $app->get('/', function (Request $request, Response $response, $args) {
@@ -29,7 +29,6 @@ $app->get('/', function (Request $request, Response $response, $args) {
 });
 
 $app->group('/api', function (RouteCollectorProxy $group) {
-
   $group->post('/login[/]', Controller\UserLogin::class);
   $group->get("/logout[/]", Controller\UserLogout::class);
   
@@ -37,10 +36,9 @@ $app->group('/api', function (RouteCollectorProxy $group) {
     $group->post('/create', Controller\UserCreate::class);
   });
 
-  $group->group('/todo', function (RouteCollectorProxy $group) {
+  $group->group('/task', function (RouteCollectorProxy $group) {
     $group->get('[/]', Controller\Home::class);
   })->add(new App\Middleware\Auth());
-  
 });
 
 

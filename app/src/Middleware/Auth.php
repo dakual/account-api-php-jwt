@@ -9,8 +9,13 @@ use Firebase\JWT\Key;
 
 class Auth
 {
-  private $key = "secretkey";
-  
+  private $key;
+
+  public function __construct()
+  {
+    $this->key = getenv('JWT_KEY');
+  }
+
   public function __invoke(Request $request, RequestHandler $handler): Response
   {
     $jwtHeader = $request->getHeaderLine('Authorization');
