@@ -12,7 +12,6 @@ require __DIR__ . '/../vendor/autoload.php';
 
 
 $app = AppFactory::create();
-$app->setBasePath("/app/public");
 $app->addBodyParsingMiddleware();
 $app->addRoutingMiddleware();
 $app->add(new BasePathMiddleware($app));
