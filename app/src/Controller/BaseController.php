@@ -40,4 +40,8 @@ abstract class BaseController
     return $response->withHeader('Set-Cookie', $cookies->toHeaders());
   }
 
+  protected function getUserId(Request $request): string 
+  {
+    return $request->getAttribute('jwt')->sub;
+  }
 }
