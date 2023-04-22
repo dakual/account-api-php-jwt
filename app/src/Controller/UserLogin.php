@@ -8,15 +8,19 @@ use App\Repository\UserRepository;
 use App\Entity\UserEntity;
 use Firebase\JWT\JWT;
 
+
 class UserLogin extends BaseController
 {
-  private $key;
+  private $jwtPrivateKey;
+  private $jwtLifeTime;
   private UserRepository $repository;
 
   public function __construct()
   {
-    $this->key = getenv('JWT_KEY');
-    $this->repository = new UserRepository();
+    $this->jwtPrivateKey = getenv('JWT_PRIVATE_KEY');
+    $this->jwtLifeTime   = getenv('JWT_LIFETIME');
+    $this->jwtIssuer     = getenv('JWT_ISSUER');
+    $this->repository    = new UserRepository();
   }
 
   public function __invoke(Request $request, Response $response): Response
@@ -38,14 +42,14 @@ class UserLogin extends BaseController
     }
     
     $token = [
-      "iss"  => "daghan",
+      "iss"  => $this->jwtIssuer,
       "aud"  => "http://example.com",
       "sub"  => $user->id,
       "iat"  => time(),
-      "exp"  => time() + 60 // (7 * 24 * 60 * 60),
+      "exp"  => time() + ((int) $this->jwtLifeTime)
     ];
 
-    $jwt = JWT::encode($token, $this->key, 'HS256');
+    $jwt = JWT::encode($token, $this->jwtPrivateKey, 'RS256');
 
     $data = array(
       'success' => true,
@@ -53,9 +57,8 @@ class UserLogin extends BaseController
       'token'   => 'Bearer ' . $jwt
     );
 
-    $response->getBody()->write(json_encode($data));
-    return $response
-      ->withHeader('content-type', 'application/json')
-      ->withStatus(200);
+    $response = $this->setJwtCookie($request, $response, $jwt);
+
+    return $this->jsonResponse($response, 'success', $data, 200);
   }
 }

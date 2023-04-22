@@ -3,7 +3,7 @@ namespace App\Entity;
 
 class UserEntity
 {
-  public int $id;
+  public string $id;
   public string $name;
   public string $username;
   public string $password;

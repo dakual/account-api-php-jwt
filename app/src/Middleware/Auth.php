@@ -9,11 +9,11 @@ use Firebase\JWT\Key;
 
 class Auth
 {
-  private $key;
+  private $jwtPublicKey;
 
   public function __construct()
   {
-    $this->key = getenv('JWT_KEY');
+    $this->jwtPublicKey = getenv('JWT_PUBLIC_KEY');
   }
 
   public function __invoke(Request $request, RequestHandler $handler): Response
@@ -38,8 +38,7 @@ class Auth
   private function checkToken(string $token): object
   {
     try {
-      // $decoded = json_decode(json_encode($decoded), true);
-      return JWT::decode($token, new Key($this->key, 'HS256'));
+      return JWT::decode($token, new Key($this->jwtPublicKey, 'RS256'));
     } catch (\Exception $ex) {
       throw new \App\Exception\Auth('Forbidden: you are not authorized.', 403);
     }

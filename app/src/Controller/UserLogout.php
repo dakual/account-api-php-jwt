@@ -11,11 +11,14 @@ class UserLogout extends BaseController
   
   public function __invoke(Request $request, Response $response): Response
   {
+    $data = array(
+      'success' => true,
+      'message' => 'Logout Successfull'
+    );
 
-    $response->getBody()->write(json_encode($data));
-    return $response
-      ->withHeader('content-type', 'application/json')
-      ->withStatus(200);
+    $response = $this->setJwtCookie($request, $response, '');
+
+    return $this->jsonResponse($response, 'success', $data, 200);
   }
 
 }

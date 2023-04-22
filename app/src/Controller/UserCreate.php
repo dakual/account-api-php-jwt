@@ -28,10 +28,7 @@ class UserCreate extends BaseController
       'user'    => $user->id
     );
 
-    $response->getBody()->write(json_encode($data));
-    return $response
-      ->withHeader('content-type', 'application/json')
-      ->withStatus(200);
+    return $this->jsonResponse($response, 'success', $data, 200);
   }
 
   private function validateUserData(array $data): UserEntity
@@ -42,12 +39,16 @@ class UserCreate extends BaseController
     if (! isset($data["password"])) {
       throw new \App\Exception\Auth('The field "password" is required.', 400);
     }
+    if (! isset($data["name"])) {
+      throw new \App\Exception\Auth('The field "name" is required.', 400);
+    }
 
     $this->repository->checkUserByUsername($data["username"]);
 
     $hash = password_hash($data["password"], PASSWORD_BCRYPT);
 
     $newUser = new UserEntity();
+    $newUser->name     = $data["name"];
     $newUser->username = $data["username"];
     $newUser->password = $hash;
 
