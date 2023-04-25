@@ -7,7 +7,7 @@ use App\Controller\BaseController;
 use App\Repository\TaskRepository;
 use App\Entity\TaskEntity;
 
-class Create extends BaseController
+class Update extends BaseController
 {
   private TaskRepository $repository;
 
@@ -16,26 +16,30 @@ class Create extends BaseController
     $this->repository = new TaskRepository();
   }
 
-  public function __invoke(Request $request, Response $response): Response
+  public function __invoke(Request $request, Response $response, array $args): Response
   {
-    $data = (array) $request->getParsedBody();
-    $data = json_decode(json_encode($data), false);
+    $taskId = (int) $args['id'];
+    $userId = $this->getUserId($request);
+    $data   = (array) $request->getParsedBody();
+    $data   = json_decode(json_encode($data), false);
     if(! isset($data->title)) {
       throw new \App\Exception\Auth('The field "title" is required.', 400);
+    }
+    if(! isset($data->status)) {
+      throw new \App\Exception\Auth('The field "status" is required.', 400);
     }
 
     $now  = date('Y-m-d\TH:i:s.uP', time());
     $task = new TaskEntity();
-    $task->uid       = $this->getUserId($request);
+    $task->id        = $taskId;
+    $task->uid       = $userId;
     $task->title     = $data->title;
     $task->status    = $data->status;
-    $task->createdAt = $now;
     $task->updatedAt = $now;
 
-    $task = $this->repository->create($task);
+    $task = $this->repository->update($task);
     $data = array(
-      'message' => 'Task successfully created!',
-      'taskid'  => $task->id
+      'task' => $task
     );
 
     return $this->jsonResponse($response, 'success', $data, 200);

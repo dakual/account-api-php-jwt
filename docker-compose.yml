@@ -10,16 +10,8 @@ services:
     volumes:
       - ./app:/app
     env_file:
-      - ".env"
-    environment:
-      - MYSQL_HOST=${MYSQL_HOST}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - JWT_ISSUER=${JWT_ISSUER}
-      - JWT_LIFETIME=${JWT_LIFETIME}
-      - JWT_PRIVATE_KEY=${JWT_PRIVATE_KEY}
-      - JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY}
+      - .env
+
   composer:
     image: composer
     container_name: composer
@@ -28,6 +20,7 @@ services:
     command: install
     depends_on:
       - php
+
   nginx:
     container_name: nginx
     build:

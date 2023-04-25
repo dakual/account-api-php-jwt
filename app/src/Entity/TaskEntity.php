@@ -3,10 +3,10 @@ namespace App\Entity;
 
 class TaskEntity
 {
-  public string $id;
+  public int $id;
   public string $uid;
   public string $title;
-  public int $status;
+  public string $status;
   public string $createdAt;
   public string $updatedAt;
 

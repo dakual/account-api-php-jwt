@@ -1,5 +1,5 @@
 <?php
-namespace App\Controller;
+namespace App\Controller\User;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -7,7 +7,7 @@ use App\Controller\BaseController;
 use App\Repository\UserRepository;
 use App\Entity\UserEntity;
 
-class UserCreate extends BaseController
+class Create extends BaseController
 {
   private UserRepository $repository;
 
@@ -23,7 +23,6 @@ class UserCreate extends BaseController
     $user = $this->repository->createUser($user);
 
     $data = array(
-      'success' => true,
       'message' => 'Create Successfull',
       'user'    => $user->id
     );

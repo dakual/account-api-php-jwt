@@ -1,5 +1,5 @@
 <?php
-namespace App\Controller;
+namespace App\Controller\User;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -9,7 +9,7 @@ use App\Entity\UserEntity;
 use Firebase\JWT\JWT;
 
 
-class UserLogin extends BaseController
+class Login extends BaseController
 {
   private $jwtPrivateKey;
   private $jwtLifeTime;
@@ -52,7 +52,6 @@ class UserLogin extends BaseController
     $jwt = JWT::encode($token, $this->jwtPrivateKey, 'RS256');
 
     $data = array(
-      'success' => true,
       'message' => 'Login Successfull',
       'token'   => 'Bearer ' . $jwt
     );

@@ -1,18 +1,17 @@
 <?php
-namespace App\Controller;
+namespace App\Controller\User;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use App\Controller\BaseController;
 
 
-class UserLogout extends BaseController
+class Logout extends BaseController
 {
   
   public function __invoke(Request $request, Response $response): Response
   {
     $data = array(
-      'success' => true,
       'message' => 'Logout Successfull'
     );
 

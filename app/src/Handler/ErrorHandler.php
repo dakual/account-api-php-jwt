@@ -18,13 +18,13 @@ class ErrorHandler implements ErrorHandlerInterface
   protected LoggerInterface $logger;
 
   public function __construct(
-      CallableResolverInterface $callableResolver,
-      ResponseFactoryInterface $responseFactory,
-      ?LoggerInterface $logger = null
+    CallableResolverInterface $callableResolver,
+    ResponseFactoryInterface $responseFactory,
+    ?LoggerInterface $logger = null
   ) {
-      $this->callableResolver = $callableResolver;
-      $this->responseFactory = $responseFactory;
-      $this->logger = $logger ?: new Logger();
+    $this->callableResolver = $callableResolver;
+    $this->responseFactory = $responseFactory;
+    $this->logger = $logger ?: new Logger();
   }
 
   public function __invoke(
@@ -42,7 +42,7 @@ class ErrorHandler implements ErrorHandlerInterface
       $error['method'] = $request->getMethod();
       $error['url'] = (string) $request->getUri();
 
-      // $this->logger->error($exception->getMessage(), $error);
+      $this->logger->error($exception->getMessage(), $error);
     }
   
     $response = $this->responseFactory->createResponse();
@@ -60,21 +60,21 @@ class ErrorHandler implements ErrorHandlerInterface
 
   private function getHttpStatusCode(Throwable $exception): int
   {
-      $statusCode = StatusCodeInterface::STATUS_INTERNAL_SERVER_ERROR;
-      if ($exception instanceof HttpException) {
-          $statusCode = (int)$exception->getCode();
-      }
+    $statusCode = StatusCodeInterface::STATUS_INTERNAL_SERVER_ERROR;
+    if ($exception instanceof HttpException) {
+      $statusCode = (int)$exception->getCode();
+    }
 
-      if ($exception instanceof DomainException || $exception instanceof InvalidArgumentException) {
-          $statusCode = StatusCodeInterface::STATUS_BAD_REQUEST;
-      }
+    if ($exception instanceof DomainException || $exception instanceof InvalidArgumentException) {
+      $statusCode = StatusCodeInterface::STATUS_BAD_REQUEST;
+    }
 
-      $file = basename($exception->getFile());
-      if ($file === 'CallableResolver.php') {
-          $statusCode = StatusCodeInterface::STATUS_NOT_FOUND;
-      }
+    $file = basename($exception->getFile());
+    if ($file === 'CallableResolver.php') {
+      $statusCode = StatusCodeInterface::STATUS_NOT_FOUND;
+    }
 
-      return $statusCode;
+    return $statusCode;
   }
 
   private function getErrorDetails(Throwable $exception, bool $displayErrorDetails): array
